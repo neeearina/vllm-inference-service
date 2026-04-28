@@ -26,7 +26,8 @@ async def generate(request: GenerateRequest) -> GenerateResponse:
         temperature=request.temperature,
     )
 
-    latency_ms = (time.perf_counter() - started_at) * 1000
+    latency_seconds = time.perf_counter() - started_at
+    latency_ms = latency_seconds * 1000
     first_output = output.outputs[0] if output.outputs else None
     generated_text = first_output.text if first_output else ""
     prompt_tokens = len(getattr(output, "prompt_token_ids", []) or request.prompt.split())
@@ -36,7 +37,7 @@ async def generate(request: GenerateRequest) -> GenerateResponse:
         "prompt_tokens=%s generated_tokens=%s latency=%.2fs max_tokens=%s temperature=%.2f",
         prompt_tokens,
         generated_tokens,
-        latency_ms / 1000,
+        latency_seconds,
         request.max_tokens,
         request.temperature,
     )
